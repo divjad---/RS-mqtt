@@ -40,6 +40,10 @@ def serve_file():
 # setting callbacks for different events to see if it works, print the message etc.
 def on_connect(client, userdata, flags, rc, properties=None):
     print("CONNACK received with code %s." % rc)
+    if rc == 0:
+        print("Connected to MQTT broker")
+    else:
+        print(f"Connection failed with error code {rc}")
 
 
 # with this callback you can see if your publish was successful
@@ -71,11 +75,6 @@ if __name__ == '__main__':
     # connect to HiveMQ Cloud on port 8883 (default for MQTT)
     client.connect("37aad5450fca492297d7d3bc3329f4ba.s2.eu.hivemq.cloud", 8883)
 
-    while client.is_connected() is False:
-        print("Reconnecting MQTT...", client.is_connected())
-        client.reconnect()
-        sleep(1)
-
     # setting callbacks, use separate functions like above for better visibility
     client.on_subscribe = on_subscribe
     client.on_message = on_message
@@ -87,8 +86,6 @@ if __name__ == '__main__':
     # loop_forever for simplicity, here you need to stop the loop manually
     # you can also use loop_start and loop_stop
     client.loop_start()
-
-    print("Connected MQTT", client.is_connected())
 
     app.run()
 
