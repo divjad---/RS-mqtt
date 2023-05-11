@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rs-mqtt-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rs-mqtt-service
+  template:
+    metadata:
+      labels:
+        app: rs-mqtt-service
+    spec:
+      containers:
+        - image: divjad123/rs-mqtt-python
+          name: rs-mqtt-service
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: server
+              protocol: TCP
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rs-mqtt-service
+
+spec:
+  ports:
+    - name: server
+      port: 8080
+      targetPort: server
+
+  selector:
+    app: rs-mqtt-service
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: izdelki-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: default-example@kubernetescrd
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /rs/mqtt-project
+            pathType: Prefix
+            backend:
+              service:
+                name: rs-mqtt-service
+                port:
+                  name: server
