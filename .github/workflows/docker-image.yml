@@ -1,4 +1,4 @@
-name: package python as Docker image
+name: Package python mqtt for RS as Docker image
 
 on:
   push:
