@@ -82,6 +82,8 @@ if __name__ == '__main__':
     # you can also use loop_start and loop_stop
     client.loop_start()
 
+    print("Connected MQTT", client.is_connected())
+
     app.run()
 
     client.loop_stop()
