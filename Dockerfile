@@ -12,4 +12,4 @@ RUN pip3 install -r req.txt
 
 COPY . .
 
-CMD [ "python3", "-m" , "app.py"]
+CMD [ "python3", "app.py"]
