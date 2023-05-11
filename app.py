@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 import json
+from time import sleep
 
 import paho.mqtt.client as paho
 from flask import Flask, jsonify
@@ -70,6 +71,11 @@ if __name__ == '__main__':
     # connect to HiveMQ Cloud on port 8883 (default for MQTT)
     client.connect("37aad5450fca492297d7d3bc3329f4ba.s2.eu.hivemq.cloud", 8883)
 
+    while client.is_connected() is False:
+        print("Reconnecting MQTT...", client.is_connected())
+        client.reconnect()
+        sleep(1)
+
     # setting callbacks, use separate functions like above for better visibility
     client.on_subscribe = on_subscribe
     client.on_message = on_message
@@ -86,4 +92,5 @@ if __name__ == '__main__':
 
     app.run()
 
+    client.disconnect()
     client.loop_stop()
