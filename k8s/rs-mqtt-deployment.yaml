@@ -17,7 +17,7 @@ spec:
           name: rs-mqtt-service
           imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - containerPort: 5000
               name: server
               protocol: TCP
 ---
@@ -30,7 +30,7 @@ metadata:
 spec:
   ports:
     - name: server
-      port: 80
+      port: 5000
       targetPort: server
 
   selector:
