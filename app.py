@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import datetime
 import json
-from time import sleep
 
 import paho.mqtt.client as paho
 from flask import Flask, jsonify
@@ -23,6 +23,7 @@ from paho import mqtt
 # Flask constructor takes the name of
 # current module (__name__) as argument.
 app = Flask(__name__)
+app.debug = True
 
 topic = "RS-data"
 password = "RSprojectESP8266"
@@ -58,10 +59,35 @@ def on_subscribe(client, userdata, mid, granted_qos, properties=None):
 
 # print message, useful for checking if it was successful
 def on_message(client, userdata, msg):
-    print(msg.topic + " " + str(msg.qos) + " " + msg.payload.decode("utf-8"))
+    payload: str = msg.payload.decode("utf-8")
+    print(msg.topic + " " + str(msg.qos) + " " + payload)
+    data = ""
+    with open('data.json', 'r+') as jsonfile:
+        file = jsonfile.read()
+        data = eval(file)
+
+    with open('data.json', "w") as jsonfile:
+        print("File", data)
+        # data = json.loads(str(data))
+        json_payload = json.loads(payload)
+        json_payload["time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        activity = json_payload["activity"]
+        del json_payload["activity"]
+        payload = eval(payload)
+        del payload["activity"]
+        payload["time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        data[activity].append(payload)
+
+        jsonfile.write(json.dumps(data))
 
 
-if __name__ == '__main__':
+def run_app():
+    app.run(debug=False, threaded=True)
+
+
+def connect_mqtt():
+    print("Connect to MQTT")
+
     # using MQTT version 5 here, for 3.1.1: MQTTv311, 3.1: MQTTv31
     # userdata is user defined data of any type, updated by user_data_set()
     # client_id is the given name of the client
@@ -87,7 +113,7 @@ if __name__ == '__main__':
     # you can also use loop_start and loop_stop
     client.loop_start()
 
-    app.run()
 
-    client.disconnect()
-    client.loop_stop()
+with app.app_context():
+    connect_mqtt()
+    print("From here")
