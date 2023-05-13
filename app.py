@@ -32,10 +32,10 @@ user = "david"
 
 @app.route('/')
 def serve_file():
-    f = open('data.json')
-    data = json.load(f)
-    f.close()
-    return jsonify(data)
+    with open('data.json', 'r+') as jsonfile:
+        file = jsonfile.read()
+        data = eval(file)
+        return jsonify(data)
 
 
 # setting callbacks for different events to see if it works, print the message etc.
