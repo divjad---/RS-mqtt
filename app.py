@@ -18,12 +18,14 @@ import json
 
 import paho.mqtt.client as paho
 from flask import Flask, jsonify
+from flask_cors import CORS
 from paho import mqtt
 
 # Flask constructor takes the name of
 # current module (__name__) as argument.
 app = Flask(__name__)
 app.debug = True
+CORS(app)
 
 topic = "RS-data"
 password = "RSprojectESP8266"
