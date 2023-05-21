@@ -29,7 +29,7 @@ CORS(app)
 
 topic = "RS-data"
 password = "RSprojectESP8266"
-user = "david"
+user = "rs-user"
 
 
 @app.route('/')
@@ -63,24 +63,26 @@ def on_subscribe(client, userdata, mid, granted_qos, properties=None):
 def on_message(client, userdata, msg):
     payload: str = msg.payload.decode("utf-8")
     print(msg.topic + " " + str(msg.qos) + " " + payload)
-    data = ""
-    with open('data.json', 'r+') as jsonfile:
-        file = jsonfile.read()
-        data = eval(file)
 
-    with open('data.json', "w") as jsonfile:
-        print("File", data)
-        # data = json.loads(str(data))
-        json_payload = json.loads(payload)
-        json_payload["time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        activity = json_payload["activity"]
-        del json_payload["activity"]
-        payload = eval(payload)
-        del payload["activity"]
-        payload["time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        data[activity].append(payload)
+    if msg.topic == topic:
+        data = ""
+        with open('data.json', 'r+') as jsonfile:
+            file = jsonfile.read()
+            data = eval(file)
 
-        jsonfile.write(json.dumps(data))
+        with open('data.json', "w") as jsonfile:
+            print("File", data)
+            # data = json.loads(str(data))
+            json_payload = json.loads(payload)
+            json_payload["time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            activity = json_payload["activity"]
+            del json_payload["activity"]
+            payload = eval(payload)
+            del payload["activity"]
+            payload["time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            data[activity].append(payload)
+
+            jsonfile.write(json.dumps(data))
 
 
 def run_app():
